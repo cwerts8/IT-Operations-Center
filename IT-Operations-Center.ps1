@@ -4,7 +4,8 @@
 
 .DESCRIPTION
     A comprehensive PowerShell GUI tool for managing Exchange Online mailbox permissions, calendar permissions,
-    automatic replies (Out of Office), message tracking, and Active Directory group memberships. Features include:
+    automatic replies (Out of Office), message tracking, Active Directory group memberships, and Microsoft 365
+    authentication methods. Features include:
     - Optional Exchange Online connection (connect when needed)
     - Visual connection status indicator with Connect/Disconnect controls
     - Mailbox permissions (Full Access & Send As)
@@ -12,6 +13,7 @@
     - Automatic Replies (OOF) with rich text editor
     - Message Trace / Tracking for email delivery troubleshooting
     - AD group member viewing and management
+    - Microsoft 365 Temporary Access Pass generation
     - Excel export capabilities for all data
     - Double-click any user/group to view their AD properties
     - GUID resolution for AD groups in permission lists
@@ -119,7 +121,7 @@
     - Excel export with auto-formatting, filters, and frozen header row
     - Requires Active Directory PowerShell module (RSAT)
 
-    Version 3.5.0 - 10-28-25 (Current)
+    Version 3.5.0 - 10-28-25
     - Added Intune Mobile Devices module for MDM device management
     - Retrieves all mobile devices (iOS, iPadOS, Android) from Microsoft Intune
     - Dashboard with real-time statistics (device counts by OS, compliance status)
@@ -138,10 +140,103 @@
     - User-selectable save location (file save dialog)
     - Excel export with auto-formatting, filters, and frozen header row
     - Requires Active Directory PowerShell module (RSAT)
+    
+    Version 4.0.0 - 10-29-25
+    - MAJOR UPDATE: Complete UI Redesign and Management Options Reorganization
+    - Header redesign: Logo and title combined in single blue bar (no more white space)
+    - Saved ~75px of vertical space with cleaner, more professional look
+    - Management Options completely reorganized from 7 to 6 logical categories
+    - New "Exchange Online" category consolidates all Exchange features (7 items)
+    - Moved Calendar Permissions from "Calendar & Resources" to "Exchange Online"
+    - Moved Message Trace/Tracking from "Compliance & Security" to "Exchange Online"
+    - Renamed "Intune & SCCM" to "Device Management" for clarity
+    - "Active Directory" category now contains pure AD functions (3 items)
+    - Improved feature organization by service type for intuitive navigation
+    - Code cleanup: reduced from 6,880 to 6,858 lines (22 lines removed)
+    - All functionality preserved - 100% backward compatible
+    - Zero breaking changes - drop-in replacement
+    - Enhanced scalability for future feature additions
+    - More professional and polished interface
+    
+    Version 4.1.0 - 10-29-25
+    - Enhanced Intune Mobile Devices module with advanced filtering and search
+    - Added device type checkboxes to filter by iOS/iPadOS, Android, Windows, and macOS
+    - Filters are now applied automatically on Load/Refresh (removed separate Apply Filter button)
+    - Updated statistics dashboard to show counts for all four device types (iOS, Android, Windows, macOS)
+    - Retrieves ALL managed devices from Intune (not just mobile devices)
+    - Added real-time search box to quickly find devices by name, user, model, serial number, IMEI, or OS
+    - Search filters instantly as you type without making new API calls
+    - Clear button to quickly reset search and show all devices
+    - Search box automatically clears when loading/refreshing devices
+    - Improved device filtering logic to support all Windows versions (Windows 10, Windows 11, etc.)
+    - Enhanced error handling with better null-checking throughout event handlers
+    - Simplified UI workflow for better user experience
+    - Refresh button now properly reloads devices with current filter selections
+    - Device count updates dynamically based on search and filter criteria
+    - Removed unnecessary Write-Log calls from Intune window for better stability
+
+    Version 4.2.0 - 11-10-25
+    - Added new Microsoft 365 section to Management Options
+    - Implemented Generate Temporary Access Pass (TAP) feature
+    - TAP generation with configurable lifetime (10-43200 minutes)
+    - Support for one-time use or multi-use TAPs
+    - Automatic Microsoft Graph connection with UserAuthenticationMethod.ReadWrite.All scope
+    - User-friendly TAP generation window with clear instructions
+    - One-click copy to clipboard functionality
+    - Real-time TAP details display (user, expiry time, usage type)
+    - Security warning about TAP being shown only once
+    - Support for username or UPN lookup
+    - Enter key support for quick TAP generation
+    - Professional UI with emoji icons and color-coded sections
+    - Comprehensive error handling and logging
+
+
+    Version 4.3.0 - 11-12-25
+    - Added Employee Conversion module to Active Directory section
+    - Convert employees between status types (e.g., Consultant to Full Time Employee)
+    - Template-based conversion with surgical group management
+    - Only removes groups associated with "from template" (preserves custom groups)
+    - Adds all groups from "to template"
+    - Automatically moves user to new template's OU
+    - Real-time preview of changes before applying
+    - Comprehensive logging of all conversion actions
+    - Built-in validation and error handling
+    
+    Version 4.4.0 - 11-14-25
+    - Added Locked Out Users Management module to Active Directory section
+    - Real-time search and filtering of locked out user accounts
+    - Multi-select unlock functionality with bulk operations
+    - Displays lockout time, bad logon count, and user details
+    - Excel export capabilities with formatted reports
+    - Comprehensive error handling and success/failure tracking
+    - Automatic refresh after unlock operations
+    - Professional red-themed UI matching security context
+    - Search across display name, username, email, department, and title
+    - Status bar with live count updates
+    - Requires Active Directory PowerShell module (RSAT)
+    
+    Version 4.5.0 - 11-14-25
+    - Updated header information and version tracking
+    - Enhanced documentation with complete feature descriptions
+    - Improved version history organization and clarity
+    - Code refinements and stability improvements
+    - Total codebase: 8,443 lines of PowerShell
+    - 4 major feature categories: Exchange Online, Microsoft 365, Active Directory, Device Management
+    - 11 active modules with 3 placeholder features for future development
+
+    Version 4.7.1 - 03-17-26 (Current)
+    - Fixed Azure.Core.dll conflict between ExchangeOnlineManagement and Microsoft Graph modules
+    - ExchangeOnlineManagement is now loaded on-demand when connecting to Exchange Online
+    - Previously loaded at startup unconditionally, preventing Graph/Intune modules from loading
+    - Intune Mobile Devices module now works in a fresh session without connecting to EXO first
+
 
 .NOTES
     File Name      : IT-Operations-Center.ps1
-    Prerequisite   : ExchangeOnlineManagement module must be installed
+    Prerequisites  : 
+    - ExchangeOnlineManagement module (for Exchange Online features)
+    - Microsoft.Graph.Authentication and Microsoft.Graph.Users modules (for M365 TAP generation)
+    - Active Directory PowerShell module/RSAT (for AD features)
     
 .USAGE
     Simply run the script. It will:
@@ -154,6 +249,7 @@
     - Calendar Permissions: Add/edit/remove calendar delegation permissions
     - Automatic Replies: Configure Out of Office messages with rich text formatting
     - Message Trace: Track and troubleshoot email delivery issues
+    - Microsoft 365: Generate Temporary Access Passes for passwordless authentication onboarding
     - AD Group Members: View group members, export to Excel, copy email addresses
     - Double-click any user/group name in permission lists to view their AD properties
 
@@ -203,11 +299,36 @@
     - Note: Distribution group searches show emails sent TO the group address
       (external emails to groups are delivered to individual members and may not appear)
     
+    Microsoft 365 - Temporary Access Pass:
+    - Generate time-limited passcodes for passwordless authentication onboarding
+    - Configurable lifetime (10 to 43,200 minutes / 30 days)
+    - One-time use or multi-use TAP options
+    - Automatic Microsoft Graph connection with required permissions
+    - User lookup by UPN or username
+    - One-click copy to clipboard
+    - Security warning that TAP is only displayed once
+    - Real-time details (user, expiry time, usage type)
+    - Use TAP to onboard Windows Hello, Microsoft Authenticator, or FIDO2 keys
+    - Enter key support for quick generation
+    
     AD Group Members:
     - Search by group name or email
     - View all members with enriched details (title, department)
     - Copy all member emails to clipboard (Outlook format)
     - Export to Excel with full member details
+
+    Employee Conversion:
+    - Template-based employee status conversion (e.g., Consultant to FTE)
+    - Select "from template" (current status) and "to template" (new status)
+    - Surgical group management: only removes groups from "from template"
+    - Preserves custom groups not associated with either template
+    - Adds all groups from "to template"
+    - Automatically moves user to new template's OU
+    - Real-time preview of all changes before applying
+    - Shows groups to remove, add, and preserve
+    - Comprehensive logging of all conversion actions
+    - Built-in validation and confirmation dialogs
+    - Requires Active Directory PowerShell module (RSAT)
     
     AD Properties Viewer:
     - Double-click any user/group in any grid to view properties
@@ -246,445 +367,496 @@
 #>
 
 # Update Script version
-$ScriptVersion = "3.5.0"
+$ScriptVersion = "4.7.1"
 
 # Load logo from file path
 # Embedded logo (Base64 encoded)
 $logoBase64 = @"
-iVBORw0KGgoAAAANSUhEUgAABrgAAAGQCAYAAAD1DmBrAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/I
-iBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDkuMC1jMDAwIDc5LjE3MWMyN2ZhYiwgMjAyMi
-8wOC8xNi0yMjozNTo0MSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiI
-geG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20v
-eGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI0LjEgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkFBQzc0NzJEOTUyQTExRURCN
-0Y1REIyODJFOUE1OUVCIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkFBQzc0NzJFOTUyQTExRURCN0Y1REIyODJFOUE1OUVCIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paW
-Q6QUFDNzQ3MkI5NTJBMTFFREI3RjVEQjI4MkU5QTU5RUIiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6QUFDNzQ3MkM5NTJBMTFFREI3RjVEQjI4MkU5QTU5RUIiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmR
-mOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4nPYG+AADI90lEQVR42uy9CZgcV33u/a+xZQvvwsbyvjAY2xgvgpsYDyQhLCEi4SYQQgJcEnMTAjE2mH1Nwr6EwAVCQjBg9HEJNwGyQABBAgQP
-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
-AACwIrgAAAAAAABYEVwAAAAAAACsCC4AAAAAAABWBBcAAAAAAAArggsAAAAAAIAVwQUAAAAAAMCK4AIAAAAAAGBFcAEAAAAAALAiuAAAAAAAAFgRXAAAAAAAAKwILgAAAAAAAFYEFwAAAAAAACuCCwAAAAAAgBXBB
-QAAAAAAwIrgAgAAAAAAYEVwAQAAAAAAsCK4AAAAAAAAWBFcAAAAAAAArAguAAAAAAAAVhJgAB2oq3uFtl7CAAAAAElFTkSuQmCC
+iVBORw0KGgoAAAANSUhEUgAABrgAAAGQCAYAAAD1DmBrAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2
+tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3Jl
+IDkuMC1jMDAwIDc5LjE3MWMyN2ZhYiwgMjAyMi8wOC8xNi0yMjozNTo0MSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi
+1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25z
+LmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYm
+UgUGhvdG9zaG9wIDI0LjEgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjg2MkEyNDlCOTUyQzExRUQ4M0Q3QUM1NkQxMjY3MkNCIiB4bXBNTTpEb2N1bWVudElEPSJ4
+bXAuZGlkOjg2MkEyNDlDOTUyQzExRUQ4M0Q3QUM1NkQxMjY3MkNCIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6ODYyQTI0OTk5NTJDMTFFRDgzRD
+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
+TkSuQmCC
 "@
 
 # Function to load logo from Base64 string
@@ -734,16 +906,8 @@ Add-Type -AssemblyName System.Windows.Forms
 [system.net.webrequest]::defaultwebproxy.BypassProxyOnLocal = $true
 
 
-
-<# Pre-connection check - OPTIONAL NOW
-Write-Host "======================================" -ForegroundColor Cyan
-Write-Host "IT Operations Center" -ForegroundColor Cyan
-Write-Host "======================================" -ForegroundColor Cyan
-Write-Host ""
-#>
-
-# Import the module
-Import-Module ExchangeOnlineManagement -ErrorAction Stop
+# ExchangeOnlineManagement is loaded on-demand when the user connects to Exchange Online
+# to avoid Azure.Core.dll version conflicts with Microsoft Graph modules (used by Intune)
 
 # Check if ImportExcel module is installed
 if (-not (Get-Module -ListAvailable -Name ImportExcel)) {
@@ -1071,7 +1235,7 @@ function Show-ADPropertiesWindow {
 				
 				foreach ($name in $sortedReports) {
 					$tb = New-Object System.Windows.Controls.TextBlock
-					$tb.Text = "• $name"
+					$tb.Text = "Ã¢â‚¬Â¢ $name"
 					$tb.Margin = "0,2,0,2"
 					$DirectReportsList.Items.Add($tb) | Out-Null
 				}
@@ -1091,7 +1255,7 @@ function Show-ADPropertiesWindow {
 					
 					foreach ($grp in $sortedGroups) {
 						$tb = New-Object System.Windows.Controls.TextBlock
-						$tb.Text = "• $($grp.DisplayName)"
+						$tb.Text = "Ã¢â‚¬Â¢ $($grp.DisplayName)"
 						$tb.Margin = "0,2,0,2"
 						$MemberOfList.Items.Add($tb) | Out-Null
 					}
@@ -1125,7 +1289,7 @@ function Show-ADPropertiesWindow {
 					
 					foreach ($mem in $sortedMembers) {
 						$tb = New-Object System.Windows.Controls.TextBlock
-						$tb.Text = "• $($mem.DisplayName)"
+						$tb.Text = "Ã¢â‚¬Â¢ $($mem.DisplayName)"
 						$tb.Margin = "0,2,0,2"
 						$MembersList.Items.Add($tb) | Out-Null
 					}
@@ -1198,7 +1362,7 @@ function Show-ADPropertiesWindow {
                               Foreground="White"/>
                 </StackPanel>
                 <TextBlock x:Name="VersionText"
-                          Text="v2.9.0"
+                          Text="v4.2.0"
                           FontSize="11"
                           Foreground="#B0BEC5"
                           VerticalAlignment="Bottom"
@@ -1359,6 +1523,27 @@ function Show-ADPropertiesWindow {
                                 </StackPanel>
                             </Expander>
                             
+                            <!-- Microsoft 365 Section -->
+                            <Expander IsExpanded="False" Margin="0,0,0,5">
+                                <Expander.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="12" Height="12" Fill="#5e72e4" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Microsoft 365" FontWeight="Bold" FontSize="13"/>
+                                    </StackPanel>
+                                </Expander.Header>
+                                <StackPanel Margin="20,5,0,5">
+                                    <Button x:Name="GenerateTAPButton" 
+                                        Content="Generate Temporary Access Pass" 
+                                        Height="32" 
+                                        Margin="0,5"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Left"
+                                        Padding="10,0"
+                                        Background="#f8f9fa"
+                                        BorderBrush="#dee2e6"/>
+                                </StackPanel>
+                            </Expander>
+                            
                             <!-- Active Directory Section -->
                             <Expander IsExpanded="False" Margin="0,0,0,5">
                                 <Expander.Header>
@@ -1379,6 +1564,24 @@ function Show-ADPropertiesWindow {
                                         BorderBrush="#dee2e6"/>
                                     <Button x:Name="ExportActiveUsersButton" 
                                         Content="Export Active Users Report" 
+                                        Height="32" 
+                                        Margin="0,5"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Left"
+                                        Padding="10,0"
+                                        Background="#f8f9fa"
+                                        BorderBrush="#dee2e6"/>
+                                    <Button x:Name="EmployeeConversionButton" 
+                                        Content="Employee Conversion" 
+                                        Height="32" 
+                                        Margin="0,5"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Left"
+                                        Padding="10,0"
+                                        Background="#f8f9fa"
+                                        BorderBrush="#dee2e6"/>
+                                    <Button x:Name="LockedOutUsersButton" 
+                                        Content="Locked Out Users" 
                                         Height="32" 
                                         Margin="0,5"
                                         HorizontalAlignment="Stretch"
@@ -1569,6 +1772,9 @@ $syncHash.GroupMembersButton = $Window.FindName("GroupMembersButton")
 $syncHash.VersionText = $Window.FindName("VersionText")
 $syncHash.AutoRepliesButton = $Window.FindName("AutoRepliesButton")
 
+# Microsoft 365
+$syncHash.GenerateTAPButton = $Window.FindName("GenerateTAPButton")
+
 # Mailbox Management - Future
 $syncHash.SendOnBehalfButton = $Window.FindName("SendOnBehalfButton")
 $syncHash.ForwardingButton = $Window.FindName("ForwardingButton")
@@ -1578,6 +1784,8 @@ $syncHash.ResourceMailboxButton = $Window.FindName("ResourceMailboxButton")
 
 # Groups & Distribution - Future
 $syncHash.ExportActiveUsersButton = $Window.FindName("ExportActiveUsersButton")
+$syncHash.EmployeeConversionButton = $Window.FindName("EmployeeConversionButton")
+$syncHash.LockedOutUsersButton = $Window.FindName("LockedOutUsersButton")
 $syncHash.DistributionGroupButton = $Window.FindName("DistributionGroupButton")
 
 # Compliance & Security - Future
@@ -1668,6 +1876,7 @@ $syncHash.ConnectButton.Add_Click({
     #>
 
     try {
+        Import-Module ExchangeOnlineManagement -ErrorAction Stop
         Connect-ExchangeOnline -ShowBanner:$false -ErrorAction Stop
         
 #       Write-Host ""
@@ -3542,6 +3751,851 @@ $syncHash.ExportActiveUsersButton.Add_Click({
     }
 })
 
+# Employee Conversion Button Handler
+$syncHash.EmployeeConversionButton.Add_Click({
+    Write-Log "Opening Employee Conversion window..."
+    Show-EmployeeConversionWindow
+})
+
+$syncHash.LockedOutUsersButton.Add_Click({
+    Write-Log "Opening Locked Out Users window..."
+    Show-LockedOutUsersWindow
+})
+
+# Function to show Employee Conversion window
+function Show-EmployeeConversionWindow {
+    # Check for Active Directory module
+    if (-not (Get-Module -ListAvailable -Name ActiveDirectory)) {
+        [System.Windows.MessageBox]::Show(
+            "Active Directory module is not available.`n`nThis feature requires the Active Directory PowerShell module (RSAT).",
+            "Module Required",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+        return
+    }
+    
+    try {
+        Import-Module ActiveDirectory -ErrorAction Stop
+    } catch {
+        [System.Windows.MessageBox]::Show(
+            "Failed to load Active Directory module.`n`n$($_.Exception.Message)",
+            "Module Error",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+        return
+    }
+    
+    [xml]$ConversionXAML = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Employee Conversion" 
+        Height="550" 
+        Width="700" 
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#233A4A" Padding="20,15">
+            <StackPanel>
+                <TextBlock Text="Employee Conversion" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                <TextBlock Text="Convert employee status (e.g., Consultant to Full Time Employee)" FontSize="12" Foreground="#B0BEC5" Margin="0,5,0,0"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Main Content -->
+        <Grid Grid.Row="1" Margin="30,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- From Template -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                <TextBlock Text="From Template (Current Status):" FontWeight="Bold" Margin="0,0,0,8" FontSize="14"/>
+                <ComboBox x:Name="FromTemplateCombo" Height="35" FontSize="13" Padding="10,8"/>
+            </StackPanel>
+            
+            <!-- To Template -->
+            <StackPanel Grid.Row="1" Margin="0,0,0,20">
+                <TextBlock Text="To Template (New Status):" FontWeight="Bold" Margin="0,0,0,8" FontSize="14"/>
+                <ComboBox x:Name="ToTemplateCombo" Height="35" FontSize="13" Padding="10,8"/>
+            </StackPanel>
+            
+            <!-- Username -->
+            <StackPanel Grid.Row="2" Margin="0,0,0,25">
+                <TextBlock Text="Username (SamAccountName):" FontWeight="Bold" Margin="0,0,0,8" FontSize="14"/>
+                <TextBox x:Name="UsernameBox" Height="35" FontSize="13" Padding="10,8" VerticalContentAlignment="Center"/>
+            </StackPanel>
+            
+            <!-- Status Message -->
+            <Border Grid.Row="3" Background="#f8f9fa" BorderBrush="#dee2e6" BorderThickness="1" Padding="15" Margin="0,0,0,20" CornerRadius="5">
+                <TextBlock x:Name="StatusText" Text="Ready to convert employee" FontSize="12" TextWrapping="Wrap" Foreground="#6c757d"/>
+            </Border>
+            
+            <!-- Preview Area -->
+            <Border Grid.Row="4" Background="White" BorderBrush="#dee2e6" BorderThickness="1" CornerRadius="5" Padding="15">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="PreviewText" FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Foreground="#495057"/>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+        
+        <!-- Footer Buttons -->
+        <Border Grid.Row="2" Background="#f8f9fa" BorderThickness="0,1,0,0" BorderBrush="#dee2e6" Padding="20,15">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="ConvertButton" 
+                        Content="Convert User" 
+                        Width="120" 
+                        Height="35" 
+                        Background="#28a745" 
+                        Foreground="White" 
+                        FontWeight="Bold"
+                        Margin="0,0,10,0"/>
+                <Button x:Name="CloseButton" 
+                        Content="Close" 
+                        Width="100" 
+                        Height="35" 
+                        Background="#6c757d" 
+                        Foreground="White"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
+"@
+    
+    try {
+        $reader = New-Object System.Xml.XmlNodeReader $ConversionXAML
+        $window = [Windows.Markup.XamlReader]::Load($reader)
+        
+        # Get controls
+        $FromTemplateCombo = $window.FindName("FromTemplateCombo")
+        $ToTemplateCombo = $window.FindName("ToTemplateCombo")
+        $UsernameBox = $window.FindName("UsernameBox")
+        $StatusText = $window.FindName("StatusText")
+        $PreviewText = $window.FindName("PreviewText")
+        $ConvertButton = $window.FindName("ConvertButton")
+        $CloseButton = $window.FindName("CloseButton")
+        
+        # Get all template accounts (accounts starting with _Template)
+        try {
+            $templates = Get-ADUser -Filter 'SamAccountName -like "_Template*"' -Properties DistinguishedName, SamAccountName | 
+                Sort-Object SamAccountName
+            
+            if ($templates.Count -eq 0) {
+                [System.Windows.MessageBox]::Show(
+                    "No template accounts found.`n`nTemplate accounts must start with '_Template'.",
+                    "No Templates Found",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Warning
+                )
+                # Template accounts check
+                $window.Close()
+                return
+            }
+            
+            # Templates loaded
+            
+            # Populate combo boxes
+            foreach ($template in $templates) {
+                $FromTemplateCombo.Items.Add($template.SamAccountName) | Out-Null
+                $ToTemplateCombo.Items.Add($template.SamAccountName) | Out-Null
+            }
+            
+            $StatusText.Text = "Loaded $($templates.Count) template account(s). Select templates and enter username to begin."
+            
+        } catch {
+            [System.Windows.MessageBox]::Show(
+                "Error loading template accounts:`n`n$($_.Exception.Message)",
+                "Error",
+                [System.Windows.MessageBoxButton]::OK,
+                [System.Windows.MessageBoxImage]::Error
+            )
+            # Error logged
+            $window.Close()
+            return
+        }
+        
+        # Convert Button Click
+        $ConvertButton.Add_Click({
+            $fromTemplate = $FromTemplateCombo.SelectedItem
+            $toTemplate = $ToTemplateCombo.SelectedItem
+            $username = $UsernameBox.Text.Trim()
+            
+            # Validation
+            if ([string]::IsNullOrWhiteSpace($fromTemplate)) {
+                [System.Windows.MessageBox]::Show("Please select a 'From Template'.", "Validation Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                return
+            }
+            
+            if ([string]::IsNullOrWhiteSpace($toTemplate)) {
+                [System.Windows.MessageBox]::Show("Please select a 'To Template'.", "Validation Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                return
+            }
+            
+            if ($fromTemplate -eq $toTemplate) {
+                [System.Windows.MessageBox]::Show("'From Template' and 'To Template' cannot be the same.", "Validation Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                return
+            }
+            
+            if ([string]::IsNullOrWhiteSpace($username)) {
+                [System.Windows.MessageBox]::Show("Please enter a username.", "Validation Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                return
+            }
+            
+            try {
+                $ConvertButton.IsEnabled = $false
+                $StatusText.Text = "Processing conversion..."
+                $StatusText.Foreground = "#ffc107"
+                $PreviewText.Text = ""
+                
+                
+                # Step 1: Verify user exists
+                try {
+                    $user = Get-ADUser -Identity $username -Properties MemberOf, DistinguishedName -ErrorAction Stop
+                } catch {
+                    throw "User '$username' not found in Active Directory."
+                }
+                
+                # Step 2: Get groups from FROM template (groups to remove)
+                try {
+                    $fromTemplateObj = Get-ADUser -Identity $fromTemplate -Properties MemberOf -ErrorAction Stop
+                    $fromTemplateGroups = @()
+                    if ($fromTemplateObj.MemberOf) {
+                        $fromTemplateGroups = $fromTemplateObj.MemberOf
+                    }
+                } catch {
+                    throw "Could not retrieve groups for template '$fromTemplate'."
+                }
+                
+                # Step 3: Get groups from TO template (groups to add)
+                try {
+                    $toTemplateObj = Get-ADUser -Identity $toTemplate -Properties MemberOf, DistinguishedName -ErrorAction Stop
+                    $toTemplateGroups = @()
+                    if ($toTemplateObj.MemberOf) {
+                        $toTemplateGroups = $toTemplateObj.MemberOf
+                    }
+                    $toTemplateOU = ($toTemplateObj.DistinguishedName -split ',', 2)[1]
+                } catch {
+                    throw "Could not retrieve groups for template '$toTemplate'."
+                }
+                
+                # Step 4: Build preview
+                $preview = ""
+                $preview += "USER: $($user.Name) ($($user.SamAccountName))`n"
+                $preview += "=" * 60 + "`n`n"
+                
+                # Step 5: Remove groups (ONLY those in fromTemplate, excluding Domain Users)
+                $groupsToRemove = @()
+                $groupsRemaining = @()
+                
+                foreach ($userGroup in $user.MemberOf) {
+                    if ($fromTemplateGroups -contains $userGroup) {
+                        # Get group name for display
+                        try {
+                            $groupObj = Get-ADGroup -Identity $userGroup -ErrorAction Stop
+                            $groupName = $groupObj.Name
+                            
+                            # Don't remove Domain Users
+                            if ($groupName -ne "Domain Users") {
+                                $groupsToRemove += @{DN = $userGroup; Name = $groupName}
+                            }
+                        } catch {
+                        }
+                    } else {
+                        # This group is NOT in the from template, so it stays
+                        try {
+                            $groupObj = Get-ADGroup -Identity $userGroup -ErrorAction Stop
+                            $groupsRemaining += $groupObj.Name
+                        } catch {
+                        }
+                    }
+                }
+                
+                $preview += "GROUPS TO REMOVE ($($groupsToRemove.Count)):`n"
+                if ($groupsToRemove.Count -eq 0) {
+                    $preview += "  (none)`n"
+                } else {
+                    foreach ($grp in $groupsToRemove) {
+                        $preview += "  - $($grp.Name)`n"
+                    }
+                }
+                $preview += "`n"
+                
+                $preview += "GROUPS TO ADD ($($toTemplateGroups.Count)):`n"
+                if ($toTemplateGroups.Count -eq 0) {
+                    $preview += "  (none)`n"
+                } else {
+                    foreach ($grpDN in $toTemplateGroups) {
+                        try {
+                            $grpObj = Get-ADGroup -Identity $grpDN -ErrorAction Stop
+                            $preview += "  + $($grpObj.Name)`n"
+                        } catch {
+                            $preview += "  + $grpDN`n"
+                        }
+                    }
+                }
+                $preview += "`n"
+                
+                $preview += "GROUPS PRESERVED ($($groupsRemaining.Count)):`n"
+                if ($groupsRemaining.Count -eq 0) {
+                    $preview += "  (none)`n"
+                } else {
+                    foreach ($grpName in $groupsRemaining) {
+                        $preview += "  = $grpName`n"
+                    }
+                }
+                $preview += "`n"
+                
+                $preview += "OU CHANGE:`n"
+                $currentOU = ($user.DistinguishedName -split ',', 2)[1]
+                $preview += "  From: $currentOU`n"
+                $preview += "  To:   $toTemplateOU`n"
+                
+                $PreviewText.Text = $preview
+                
+                # Confirmation
+                $result = [System.Windows.MessageBox]::Show(
+                    "Review the changes in the preview area.`n`nProceed with conversion?",
+                    "Confirm Conversion",
+                    [System.Windows.MessageBoxButton]::YesNo,
+                    [System.Windows.MessageBoxImage]::Question
+                )
+                
+                if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
+                    
+                    # Execute: Remove groups
+                    $removedCount = 0
+                    foreach ($grp in $groupsToRemove) {
+                        try {
+                            Remove-ADGroupMember -Identity $grp.DN -Members $user.DistinguishedName -Confirm:$false -ErrorAction Stop
+                            $removedCount++
+                        } catch {
+                        }
+                    }
+                    
+                    # Execute: Add groups
+                    $addedCount = 0
+                    foreach ($grpDN in $toTemplateGroups) {
+                        try {
+                            Add-ADGroupMember -Identity $grpDN -Members $user.DistinguishedName -ErrorAction Stop
+                            $grpObj = Get-ADGroup -Identity $grpDN -ErrorAction SilentlyContinue
+                            $addedCount++
+                        } catch {
+                        }
+                    }
+                    
+                    # Execute: Move OU
+                    try {
+                        Move-ADObject -Identity $user.DistinguishedName -TargetPath $toTemplateOU -ErrorAction Stop
+                    } catch {
+                    }
+                    
+                    $StatusText.Text = "Conversion complete! Removed $removedCount group(s), added $addedCount group(s), and moved OU."
+                    $StatusText.Foreground = "#28a745"
+                    
+                    [System.Windows.MessageBox]::Show(
+                        "Conversion completed successfully!`n`nRemoved: $removedCount group(s)`nAdded: $addedCount group(s)`nMoved to: $toTemplateOU",
+                        "Success",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Information
+                    )
+                    
+                    
+                } else {
+                    $StatusText.Text = "Conversion cancelled by user"
+                    $StatusText.Foreground = "#6c757d"
+                }
+                
+            } catch {
+                $errorMsg = $_.Exception.Message
+                $StatusText.Text = "Error: $errorMsg"
+                $StatusText.Foreground = "#dc3545"
+                [System.Windows.MessageBox]::Show(
+                    "Error during conversion:`n`n$errorMsg",
+                    "Conversion Error",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Error
+                )
+            } finally {
+                $ConvertButton.IsEnabled = $true
+            }
+        })
+        
+        # Close button
+        $CloseButton.Add_Click({ $window.Close() })
+        
+        # Show window
+        $window.ShowDialog() | Out-Null
+        
+    } catch {
+        $errorMsg = $_.Exception.Message
+        [System.Windows.MessageBox]::Show(
+            "Failed to open Employee Conversion window:`n`n$errorMsg",
+            "Error",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
+
+# Function to show Locked Out Users window
+function Show-LockedOutUsersWindow {
+    # Check for Active Directory module
+    if (-not (Get-Module -ListAvailable -Name ActiveDirectory)) {
+        [System.Windows.MessageBox]::Show(
+            "Active Directory module is not available.`n`nThis feature requires the Active Directory PowerShell module (RSAT).",
+            "Module Required",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+        return
+    }
+    
+    try {
+        Import-Module ActiveDirectory -ErrorAction Stop
+    } catch {
+        [System.Windows.MessageBox]::Show(
+            "Failed to load Active Directory module.`n`n$($_.Exception.Message)",
+            "Module Error",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+        return
+    }
+    
+    [xml]$LockedUsersXAML = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Locked Out Users Management" 
+        Height="600" 
+        Width="1000" 
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#dc3545" Padding="20,15">
+            <StackPanel>
+                <TextBlock Text="Locked Out Users Management" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                <TextBlock Text="View and unlock user accounts that are currently locked out" FontSize="12" Foreground="#FFE0E0" Margin="0,5,0,0"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Search and Actions Bar -->
+        <Border Grid.Row="1" Background="#f8f9fa" Padding="15,10" BorderBrush="#dee2e6" BorderThickness="0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <DockPanel Grid.Column="0">
+                    <Button x:Name="ClearSearchButton" 
+                            Content="Clear" 
+                            Width="50" 
+                            Height="30" 
+                            Margin="5,0,0,0"
+                            DockPanel.Dock="Right"
+                            Background="#6c757d" 
+                            Foreground="White"
+                            FontWeight="Bold"
+                            ToolTip="Clear search"/>
+                    <TextBox x:Name="SearchBox" 
+                            Height="30" 
+                            Padding="8,5"
+                            VerticalContentAlignment="Center"
+                            FontSize="13"/>
+                </DockPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0">
+                    <Button x:Name="RefreshButton" 
+                            Content="Refresh" 
+                            Width="100" 
+                            Height="30" 
+                            Margin="0,0,5,0"
+                            Background="#007bff" 
+                            Foreground="White" 
+                            FontWeight="Bold"/>
+                    <Button x:Name="UnlockSelectedButton" 
+                            Content="Unlock Selected" 
+                            Width="130" 
+                            Height="30" 
+                            Margin="0,0,5,0"
+                            Background="#28a745" 
+                            Foreground="White" 
+                            FontWeight="Bold"
+                            IsEnabled="False"/>
+                    <Button x:Name="ExportButton" 
+                            Content="Export to Excel" 
+                            Width="130" 
+                            Height="30"
+                            Background="#17a2b8" 
+                            Foreground="White" 
+                            FontWeight="Bold"
+                            IsEnabled="False"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Data Grid -->
+        <Border Grid.Row="2" BorderBrush="#dee2e6" BorderThickness="1" Margin="15,10">
+            <DataGrid x:Name="LockedOutUsersDataGrid" 
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True"
+                      SelectionMode="Extended"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      AlternatingRowBackground="#f8f9fa"
+                      RowHeight="28"
+                      FontSize="12">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="180"/>
+                    <DataGridTextColumn Header="Username" Binding="{Binding SamAccountName}" Width="120"/>
+                    <DataGridTextColumn Header="Email" Binding="{Binding EmailAddress}" Width="200"/>
+                    <DataGridTextColumn Header="Lockout Time" Binding="{Binding LockoutTimeFormatted}" Width="150"/>
+                    <DataGridTextColumn Header="Bad Logon Count" Binding="{Binding BadLogonCount}" Width="110"/>
+                    <DataGridTextColumn Header="Department" Binding="{Binding Department}" Width="120"/>
+                    <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+        
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Background="#f8f9fa" Padding="15,10" BorderBrush="#dee2e6" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="StatusText" Text="Click Refresh to load locked out users" FontSize="12" Foreground="#6c757d"/>
+                <TextBlock x:Name="CountText" Text="" FontSize="12" Foreground="#007bff" FontWeight="Bold" Margin="10,0,0,0"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Close Button -->
+        <Border Grid.Row="4" Background="White" Padding="15,10">
+            <Button x:Name="CloseButton" 
+                    Content="Close" 
+                    Width="100" 
+                    Height="35" 
+                    HorizontalAlignment="Right"
+                    Background="#6c757d" 
+                    Foreground="White" 
+                    FontWeight="Bold"/>
+        </Border>
+    </Grid>
+</Window>
+"@
+
+    try {
+        $reader = New-Object System.Xml.XmlNodeReader $LockedUsersXAML
+        $LockedUsersWindow = [Windows.Markup.XamlReader]::Load($reader)
+        
+        # Get controls
+        $SearchBox = $LockedUsersWindow.FindName("SearchBox")
+        $ClearSearchButton = $LockedUsersWindow.FindName("ClearSearchButton")
+        $RefreshButton = $LockedUsersWindow.FindName("RefreshButton")
+        $UnlockSelectedButton = $LockedUsersWindow.FindName("UnlockSelectedButton")
+        $ExportButton = $LockedUsersWindow.FindName("ExportButton")
+        $LockedOutUsersDataGrid = $LockedUsersWindow.FindName("LockedOutUsersDataGrid")
+        $StatusText = $LockedUsersWindow.FindName("StatusText")
+        $CountText = $LockedUsersWindow.FindName("CountText")
+        $CloseButton = $LockedUsersWindow.FindName("CloseButton")
+        
+        # Store locked users data at script scope for filtering
+        $script:lockedOutUsers = @()
+        $script:filteredLockedOutUsers = @()
+        
+        # Refresh button click handler
+        $RefreshButton.Add_Click({
+            try {
+                $StatusText.Text = "Scanning for locked out users..."
+                $StatusText.Foreground = "#ffc107"
+                $RefreshButton.IsEnabled = $false
+                $UnlockSelectedButton.IsEnabled = $false
+                $ExportButton.IsEnabled = $false
+                $SearchBox.Text = ""
+                
+                # Search for locked out users
+                $lockedUsers = Search-ADAccount -LockedOut -UsersOnly | 
+                    Get-ADUser -Properties DisplayName, EmailAddress, LockedOut, LockoutTime, 
+                                         BadLogonCount, BadPasswordTime, Department, Title, 
+                                         LastLogonDate, Enabled
+                
+                if ($lockedUsers) {
+                    # Convert to array if single result
+                    if ($lockedUsers -isnot [System.Array]) {
+                        $lockedUsers = @($lockedUsers)
+                    }
+                    
+                    # Always return as array, even for single results
+                    $script:lockedOutUsers = @($lockedUsers | ForEach-Object {
+                        # Format lockout time
+                        $lockoutTimeStr = "N/A"
+                        if ($_.LockoutTime -and $_.LockoutTime -ne [DateTime]::MinValue) {
+                            try {
+                                $lockoutTimeStr = Get-Date $_.LockoutTime -Format "MM/dd/yyyy hh:mm:ss tt"
+                            } catch {
+                                $lockoutTimeStr = "N/A"
+                            }
+                        }
+                        
+                        [PSCustomObject]@{
+                            DisplayName = $_.DisplayName
+                            SamAccountName = $_.SamAccountName
+                            EmailAddress = $_.EmailAddress
+                            LockoutTime = $_.LockoutTime
+                            LockoutTimeFormatted = $lockoutTimeStr
+                            BadLogonCount = $_.BadLogonCount
+                            Department = $_.Department
+                            Title = $_.Title
+                            LastLogonDate = $_.LastLogonDate
+                            Enabled = $_.Enabled
+                        }
+                    })
+                    
+                    $script:filteredLockedOutUsers = $script:lockedOutUsers
+                    $LockedOutUsersDataGrid.ItemsSource = [System.Collections.ArrayList]$script:lockedOutUsers
+                    
+                    $StatusText.Text = "Loaded locked out users successfully"
+                    $StatusText.Foreground = "#28a745"
+                    $CountText.Text = "Total: $($script:lockedOutUsers.Count) user(s) locked out"
+                    $ExportButton.IsEnabled = $true
+                } else {
+                    $script:lockedOutUsers = @()
+                    $script:filteredLockedOutUsers = @()
+                    $LockedOutUsersDataGrid.ItemsSource = $null
+                    $StatusText.Text = "No locked out users found"
+                    $StatusText.Foreground = "#28a745"
+                    $CountText.Text = ""
+                }
+            } catch {
+                $StatusText.Text = "Error: $($_.Exception.Message)"
+                $StatusText.Foreground = "#dc3545"
+                $CountText.Text = ""
+                [System.Windows.MessageBox]::Show(
+                    "Failed to query locked out users:`n`n$($_.Exception.Message)",
+                    "Error",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Error
+                )
+            } finally {
+                $RefreshButton.IsEnabled = $true
+            }
+        }.GetNewClosure())
+        
+        # Search box text changed handler
+        $SearchBox.Add_TextChanged({
+            if ($script:lockedOutUsers.Count -eq 0) { return }
+            
+            $searchText = $SearchBox.Text.Trim()
+            
+            if ([string]::IsNullOrEmpty($searchText)) {
+                $script:filteredLockedOutUsers = $script:lockedOutUsers
+                $LockedOutUsersDataGrid.ItemsSource = [System.Collections.ArrayList]$script:lockedOutUsers
+                $CountText.Text = "Total: $($script:lockedOutUsers.Count) user(s) locked out"
+            } else {
+                # Always return as array, even for single search result
+                $script:filteredLockedOutUsers = @($script:lockedOutUsers | Where-Object {
+                    $_.DisplayName -like "*$searchText*" -or
+                    $_.SamAccountName -like "*$searchText*" -or
+                    $_.EmailAddress -like "*$searchText*" -or
+                    $_.Department -like "*$searchText*" -or
+                    $_.Title -like "*$searchText*"
+                })
+                
+                $LockedOutUsersDataGrid.ItemsSource = [System.Collections.ArrayList]$script:filteredLockedOutUsers
+                $CountText.Text = "Showing: $($script:filteredLockedOutUsers.Count) of $($script:lockedOutUsers.Count) user(s)"
+            }
+        }.GetNewClosure())
+        
+        # Clear search button
+        $ClearSearchButton.Add_Click({
+            $SearchBox.Text = ""
+        }.GetNewClosure())
+        
+        # DataGrid selection changed handler
+        $LockedOutUsersDataGrid.Add_SelectionChanged({
+            $UnlockSelectedButton.IsEnabled = $LockedOutUsersDataGrid.SelectedItems.Count -gt 0
+        }.GetNewClosure())
+        
+        # Unlock selected button click handler
+        $UnlockSelectedButton.Add_Click({
+            $selectedUsers = @($LockedOutUsersDataGrid.SelectedItems)
+            
+            if ($selectedUsers.Count -eq 0) {
+                [System.Windows.MessageBox]::Show(
+                    "Please select at least one user to unlock.",
+                    "No Selection",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Warning
+                )
+                return
+            }
+            
+            # Confirm action
+            $confirmResult = [System.Windows.MessageBox]::Show(
+                "Are you sure you want to unlock $($selectedUsers.Count) user account$(if($selectedUsers.Count -ne 1){'s'})?`n`nThis will allow the user$(if($selectedUsers.Count -ne 1){'s'}) to log in again.",
+                "Confirm Unlock",
+                [System.Windows.MessageBoxButton]::YesNo,
+                [System.Windows.MessageBoxImage]::Question
+            )
+            
+            if ($confirmResult -eq [System.Windows.MessageBoxResult]::Yes) {
+                $StatusText.Text = "Unlocking selected users..."
+                $StatusText.Foreground = "#ffc107"
+                $UnlockSelectedButton.IsEnabled = $false
+                
+                $successCount = 0
+                $failCount = 0
+                $errorMessages = @()
+                
+                foreach ($user in $selectedUsers) {
+                    try {
+                        Unlock-ADAccount -Identity $user.SamAccountName -ErrorAction Stop
+                        $successCount++
+                    } catch {
+                        $failCount++
+                        $errorMessages += "$($user.SamAccountName): $($_.Exception.Message)"
+                    }
+                }
+                
+                # Show results
+                if ($failCount -eq 0) {
+                    [System.Windows.MessageBox]::Show(
+                        "Successfully unlocked $successCount user account$(if($successCount -ne 1){'s'}).",
+                        "Success",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Information
+                    )
+                    $StatusText.Text = "Successfully unlocked $successCount user(s)"
+                    $StatusText.Foreground = "#28a745"
+                    
+                    # Refresh the list
+                    $RefreshButton.RaiseEvent([System.Windows.RoutedEventArgs]::new([System.Windows.Controls.Button]::ClickEvent))
+                } else {
+                    $message = "Unlocked: $successCount`nFailed: $failCount`n`nErrors:`n" + ($errorMessages -join "`n")
+                    [System.Windows.MessageBox]::Show(
+                        $message,
+                        "Partial Success",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Warning
+                    )
+                    $StatusText.Text = "Unlocked $successCount user(s), $failCount failed"
+                    $StatusText.Foreground = "#ffc107"
+                    
+                    # Refresh the list
+                    $RefreshButton.RaiseEvent([System.Windows.RoutedEventArgs]::new([System.Windows.Controls.Button]::ClickEvent))
+                }
+            }
+        }.GetNewClosure())
+        
+        # Export to Excel button
+        $ExportButton.Add_Click({
+            if ($script:filteredLockedOutUsers.Count -eq 0) {
+                [System.Windows.MessageBox]::Show(
+                    "No data to export. Please load locked out users first.",
+                    "No Data",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Warning
+                )
+                return
+            }
+            
+            try {
+                # Create SaveFileDialog
+                $saveDialog = New-Object Microsoft.Win32.SaveFileDialog
+                $saveDialog.Filter = "Excel Files (*.xlsx)|*.xlsx"
+                $saveDialog.Title = "Save Locked Out Users Report"
+                $saveDialog.FileName = "LockedOutUsers_$(Get-Date -Format 'yyyyMMdd_HHmmss').xlsx"
+                
+                if ($saveDialog.ShowDialog()) {
+                    $excelPath = $saveDialog.FileName
+                    
+                    $StatusText.Text = "Exporting to Excel..."
+                    $StatusText.Foreground = "#ffc107"
+                    $ExportButton.IsEnabled = $false
+                    
+                    # Prepare data for export
+                    $exportData = $script:filteredLockedOutUsers | Select-Object `
+                        DisplayName,
+                        SamAccountName,
+                        EmailAddress,
+                        LockoutTimeFormatted,
+                        BadLogonCount,
+                        Department,
+                        Title,
+                        @{Name='Enabled';Expression={if($_.Enabled){'Yes'}else{'No'}}}
+                    
+                    # Export to Excel with formatting
+                    $exportData | Export-Excel -Path $excelPath `
+                        -AutoSize `
+                        -AutoFilter `
+                        -FreezeTopRow `
+                        -BoldTopRow `
+                        -TableName "LockedOutUsers" `
+                        -TableStyle Medium2
+                    
+                    $StatusText.Text = "Exported successfully"
+                    $StatusText.Foreground = "#28a745"
+                    
+                    [System.Windows.MessageBox]::Show(
+                        "Locked out users exported successfully to:`n`n$excelPath",
+                        "Export Complete",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Information
+                    )
+                }
+            } catch {
+                $StatusText.Text = "Export failed"
+                $StatusText.Foreground = "#dc3545"
+                [System.Windows.MessageBox]::Show(
+                    "Failed to export to Excel:`n`n$($_.Exception.Message)",
+                    "Export Error",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Error
+                )
+            } finally {
+                $ExportButton.IsEnabled = $true
+            }
+        }.GetNewClosure())
+        
+        # Close button
+        $CloseButton.Add_Click({
+            $LockedUsersWindow.Close()
+        })
+        
+        # Show the window
+        $LockedUsersWindow.ShowDialog() | Out-Null
+        
+    } catch {
+        $errorMsg = $_.Exception.Message
+        [System.Windows.MessageBox]::Show(
+            "Failed to open Locked Out Users window:`n`n$errorMsg",
+            "Error",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
+
+
 $syncHash.AutoRepliesButton.Add_Click({
     # Check if connected
     $connInfo = Get-ConnectionInformation -ErrorAction SilentlyContinue
@@ -4622,7 +5676,7 @@ $syncHash.MessageTraceButton.Add_Click({
             [string]::IsNullOrWhiteSpace($recipient) -and 
             [string]::IsNullOrWhiteSpace($messageId)) {
             [System.Windows.MessageBox]::Show(
-                "Please enter at least one search criteria:`n`n• Sender Email`n• Recipient Email`n• Message ID",
+                "Please enter at least one search criteria:`n`nÃ¢â‚¬Â¢ Sender Email`nÃ¢â‚¬Â¢ Recipient Email`nÃ¢â‚¬Â¢ Message ID",
                 "Validation",
                 [System.Windows.MessageBoxButton]::OK,
                 [System.Windows.MessageBoxImage]::Warning
@@ -6418,34 +7472,72 @@ function Show-IntuneMobileDevicesWindow {
         </Grid.RowDefinitions>
         
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,15">
-            <TextBlock Text="Intune Mobile Devices" FontSize="24" FontWeight="Bold" Foreground="#333"/>
-            <TextBlock Text="View and export all mobile devices managed by Microsoft Intune" 
-                      FontSize="13" Foreground="#666" Margin="0,5,0,0"/>
-        </StackPanel>
+        <Border Grid.Row="0" Background="#233A4A" Padding="20,15" Margin="-20,-20,0,15">
+            <StackPanel>
+                <TextBlock Text="Intune Mobile Devices" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                <TextBlock Text="View and export all mobile devices managed by Microsoft Intune" 
+                          FontSize="12" Foreground="#B0BEC5" Margin="0,5,0,0"/>
+            </StackPanel>
+        </Border>
         
         <!-- Control Panel -->
         <Border Grid.Row="1" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" 
                 Padding="15" Margin="0,0,0,15" CornerRadius="4">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
                 
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <Button x:Name="LoadDevicesButton" Content="Load Devices" Width="130"/>
-                    <Button x:Name="RefreshButton" Content="Refresh" Width="100" Background="#28a745"/>
-                    <TextBlock x:Name="StatusText" Text="Ready" VerticalAlignment="Center" 
-                              Margin="15,0,0,0" FontSize="13" Foreground="#666"/>
-                </StackPanel>
+                <!-- Top Row: Buttons and Status -->
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,15,0">
+                        <Button x:Name="LoadDevicesButton" Content="Load Devices" Width="130"/>
+                        <Button x:Name="RefreshButton" Content="Refresh" Width="100" Background="#28a745"/>
+                    </StackPanel>
+                    
+                    <!-- Search Box -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,15,0">
+                        <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
+                        <TextBox x:Name="SearchBox" Width="250" Height="26" VerticalContentAlignment="Center"
+                                Padding="5,0,0,0" ToolTip="Search by device name, user, model, or OS"/>
+                        <Button x:Name="ClearSearchButton" Content="Clear" Width="60" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    
+                    <TextBlock Grid.Column="2" x:Name="StatusText" Text="Ready" VerticalAlignment="Center" 
+                              FontSize="13" Foreground="#666"/>
+                    
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                        <TextBlock Text="Total Devices:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="DeviceCountText" Text="0" VerticalAlignment="Center" 
+                                  FontSize="16" FontWeight="Bold" Foreground="#0078D4" Margin="0,0,20,0"/>
+                        <Button x:Name="ExportButton" Content="Export to Excel" Width="140" Background="#28a745"/>
+                    </StackPanel>
+                </Grid>
                 
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <TextBlock Text="Total Devices:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
-                    <TextBlock x:Name="DeviceCountText" Text="0" VerticalAlignment="Center" 
-                              FontSize="16" FontWeight="Bold" Foreground="#0078D4" Margin="0,0,20,0"/>
-                    <Button x:Name="ExportButton" Content="Export to Excel" Width="140" Background="#28a745"/>
-                </StackPanel>
+                <!-- Bottom Row: Device Type Filters -->
+                <Border Grid.Row="1" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1" 
+                        Padding="10" CornerRadius="3">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Device Type Filter (applied on Load/Refresh):" VerticalAlignment="Center" 
+                                  FontWeight="SemiBold" Margin="0,0,15,0"/>
+                        <CheckBox x:Name="FilteriOS" Content="iOS/iPadOS" IsChecked="True" 
+                                 VerticalAlignment="Center" Margin="0,0,15,0"/>
+                        <CheckBox x:Name="FilterAndroid" Content="Android" IsChecked="True" 
+                                 VerticalAlignment="Center" Margin="0,0,15,0"/>
+                        <CheckBox x:Name="FilterWindows" Content="Windows" IsChecked="True" 
+                                 VerticalAlignment="Center" Margin="0,0,15,0"/>
+                        <CheckBox x:Name="FilterMacOS" Content="macOS" IsChecked="True" 
+                                 VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
             </Grid>
         </Border>
         
@@ -6462,15 +7554,23 @@ function Show-IntuneMobileDevicesWindow {
                 <Border Grid.Row="0" Background="#F8F9FA" BorderBrush="#E0E0E0" 
                        BorderThickness="0,0,0,1" Padding="15,10">
                     <StackPanel Orientation="Horizontal">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,30,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
                             <TextBlock Text="iOS/iPadOS: " FontWeight="SemiBold" Foreground="#666"/>
                             <TextBlock x:Name="IosCountText" Text="0" FontWeight="Bold" Foreground="#0078D4"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,30,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
                             <TextBlock Text="Android: " FontWeight="SemiBold" Foreground="#666"/>
                             <TextBlock x:Name="AndroidCountText" Text="0" FontWeight="Bold" Foreground="#3DDC84"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,30,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
+                            <TextBlock Text="Windows: " FontWeight="SemiBold" Foreground="#666"/>
+                            <TextBlock x:Name="WindowsCountText" Text="0" FontWeight="Bold" Foreground="#0078D4"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
+                            <TextBlock Text="macOS: " FontWeight="SemiBold" Foreground="#666"/>
+                            <TextBlock x:Name="MacOSCountText" Text="0" FontWeight="Bold" Foreground="#A2AAAD"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
                             <TextBlock Text="Compliant: " FontWeight="SemiBold" Foreground="#666"/>
                             <TextBlock x:Name="CompliantCountText" Text="0" FontWeight="Bold" Foreground="#28a745"/>
                         </StackPanel>
@@ -6508,150 +7608,22 @@ function Show-IntuneMobileDevicesWindow {
         $DeviceCountText = $window.FindName("DeviceCountText")
         $IosCountText = $window.FindName("IosCountText")
         $AndroidCountText = $window.FindName("AndroidCountText")
+        $WindowsCountText = $window.FindName("WindowsCountText")
+        $MacOSCountText = $window.FindName("MacOSCountText")
         $CompliantCountText = $window.FindName("CompliantCountText")
         $NonCompliantCountText = $window.FindName("NonCompliantCountText")
+        $SearchBox = $window.FindName("SearchBox")
+        $ClearSearchButton = $window.FindName("ClearSearchButton")
+        
+        # Get filter checkboxes
+        $FilteriOS = $window.FindName("FilteriOS")
+        $FilterAndroid = $window.FindName("FilterAndroid")
+        $FilterWindows = $window.FindName("FilterWindows")
+        $FilterMacOS = $window.FindName("FilterMacOS")
         
         # Script-level variable to store device data
         $script:intuneDevices = @()
-        
-        # Function to update statistics
-        function Update-DeviceStats {
-            $total = $script:intuneDevices.Count
-            $DeviceCountText.Text = $total.ToString()
-            
-            if ($total -gt 0) {
-                $iosCount = ($script:intuneDevices | Where-Object { $_.'Operating System' -in @('iOS', 'iPadOS') }).Count
-                $androidCount = ($script:intuneDevices | Where-Object { $_.'Operating System' -eq 'Android' }).Count
-                $compliantCount = ($script:intuneDevices | Where-Object { $_.'Compliance State' -eq 'compliant' }).Count
-                $nonCompliantCount = ($script:intuneDevices | Where-Object { $_.'Compliance State' -eq 'noncompliant' }).Count
-                
-                $IosCountText.Text = $iosCount.ToString()
-                $AndroidCountText.Text = $androidCount.ToString()
-                $CompliantCountText.Text = $compliantCount.ToString()
-                $NonCompliantCountText.Text = $nonCompliantCount.ToString()
-            }
-        }
-        
-        # Load Devices function
-        function Load-IntuneDevices {
-            try {
-                $LoadDevicesButton.IsEnabled = $false
-                $RefreshButton.IsEnabled = $false
-                $StatusText.Text = "Connecting to Microsoft Graph..."
-                $StatusText.Foreground = "#FF9800"
-                
-                Write-Log "Connecting to Microsoft Graph for Intune devices..."
-                
-                # Check if Microsoft.Graph modules are installed
-                $requiredModules = @('Microsoft.Graph.Authentication', 'Microsoft.Graph.DeviceManagement')
-                foreach ($module in $requiredModules) {
-                    if (-not (Get-Module -ListAvailable -Name $module)) {
-                        $StatusText.Text = "Installing $module module..."
-                        Write-Log "Installing $module..."
-                        Install-Module -Name $module -Scope CurrentUser -Force -AllowClobber
-                    }
-                }
-                
-                # Import modules
-                Import-Module Microsoft.Graph.Authentication -ErrorAction Stop
-                Import-Module Microsoft.Graph.DeviceManagement -ErrorAction Stop
-                
-                # Check if already connected
-                $context = Get-MgContext -ErrorAction SilentlyContinue
-                if ($null -eq $context) {
-                    # Connect to Microsoft Graph
-                    Connect-MgGraph -Scopes "DeviceManagementManagedDevices.Read.All", "User.Read.All" -NoWelcome
-                    Write-Log "Connected to Microsoft Graph"
-                }
-                
-                $StatusText.Text = "Retrieving devices from Intune..."
-                Write-Log "Retrieving managed devices..."
-                
-                # Get all managed devices using pagination
-                $uri = "https://graph.microsoft.com/v1.0/deviceManagement/managedDevices"
-                $allDevices = @()
-                
-                do {
-                    $response = Invoke-MgGraphRequest -Uri $uri -Method GET
-                    $allDevices += $response.value
-                    $uri = $response.'@odata.nextLink'
-                    
-                    $StatusText.Text = "Retrieved $($allDevices.Count) devices..."
-                } while ($uri)
-                
-                Write-Log "Retrieved $($allDevices.Count) total devices"
-                
-                # Filter for mobile devices only
-                $mobileDevices = $allDevices | Where-Object { 
-                    $_.operatingSystem -in @('iOS', 'Android', 'iPadOS') 
-                }
-                
-                Write-Log "Found $($mobileDevices.Count) mobile devices"
-                
-                $StatusText.Text = "Processing device information..."
-                
-                # Format device information
-                $script:intuneDevices = foreach ($device in $mobileDevices) {
-                    [PSCustomObject]@{
-                        'Device Name' = $device.deviceName
-                        'User Display Name' = $device.userDisplayName
-                        'User Principal Name' = $device.userPrincipalName
-                        'Operating System' = $device.operatingSystem
-                        'OS Version' = $device.osVersion
-                        'Model' = $device.model
-                        'Manufacturer' = $device.manufacturer
-                        'IMEI' = $device.imei
-                        'Serial Number' = $device.serialNumber
-                        'Phone Number' = $device.phoneNumber
-                        'Enrollment Date' = if ($device.enrolledDateTime) { 
-                            (Get-Date $device.enrolledDateTime).ToString('yyyy-MM-dd HH:mm:ss') 
-                        } else { 'N/A' }
-                        'Last Sync' = if ($device.lastSyncDateTime) { 
-                            (Get-Date $device.lastSyncDateTime).ToString('yyyy-MM-dd HH:mm:ss') 
-                        } else { 'N/A' }
-                        'Compliance State' = $device.complianceState
-                        'Management State' = $device.managementState
-                        'Ownership' = $device.managedDeviceOwnerType
-                        'Supervised' = $device.isSupervised
-                        'Encrypted' = $device.isEncrypted
-                        'Jail Broken' = $device.jailBroken
-                        'Total Storage (GB)' = if ($device.totalStorageSpaceInBytes) { 
-                            [math]::Round($device.totalStorageSpaceInBytes / 1GB, 2) 
-                        } else { 'N/A' }
-                        'Free Storage (GB)' = if ($device.freeStorageSpaceInBytes) { 
-                            [math]::Round($device.freeStorageSpaceInBytes / 1GB, 2) 
-                        } else { 'N/A' }
-                    }
-                }
-                
-                # Update DataGrid
-                $DevicesDataGrid.ItemsSource = $script:intuneDevices
-                
-                # Update statistics
-                Update-DeviceStats
-                
-                $StatusText.Text = "Loaded $($script:intuneDevices.Count) mobile devices"
-                $StatusText.Foreground = "#28a745"
-                Write-Log "Successfully loaded $($script:intuneDevices.Count) mobile devices"
-                
-                $ExportButton.IsEnabled = $true
-                
-            } catch {
-                $errorMsg = $_.Exception.Message
-                Write-Log "Error loading Intune devices: $errorMsg"
-                $StatusText.Text = "Error: $errorMsg"
-                $StatusText.Foreground = "#dc3545"
-                [System.Windows.MessageBox]::Show(
-                    "Failed to load Intune devices:`n`n$errorMsg",
-                    "Error",
-                    [System.Windows.MessageBoxButton]::OK,
-                    [System.Windows.MessageBoxImage]::Error
-                )
-            } finally {
-                $LoadDevicesButton.IsEnabled = $true
-                $RefreshButton.IsEnabled = $true
-            }
-        }
+        $script:allDevices = @()  # Store all devices before filtering
         
         # Export to Excel function
         function Export-IntuneDevicesToExcel {
@@ -6680,7 +7652,6 @@ function Show-IntuneMobileDevicesWindow {
                 }
                 
                 if (-not $saveDialog.ShowDialog()) {
-                    Write-Log "Export cancelled by user"
                     $ExportButton.IsEnabled = $true
                     return
                 }
@@ -6688,8 +7659,6 @@ function Show-IntuneMobileDevicesWindow {
                 $outputFile = $saveDialog.FileName
                 $StatusText.Text = "Exporting to Excel..."
                 $StatusText.Foreground = "#FF9800"
-                
-                Write-Log "Exporting to: $outputFile"
                 
                 # Export to Excel with formatting
                 $script:intuneDevices | Export-Excel -Path $outputFile `
@@ -6749,7 +7718,6 @@ function Show-IntuneMobileDevicesWindow {
                 
                 $StatusText.Text = "Export complete"
                 $StatusText.Foreground = "#28a745"
-                Write-Log "Export completed: $outputFile"
                 
                 # Ask to open file
                 $result = [System.Windows.MessageBox]::Show(
@@ -6765,7 +7733,6 @@ function Show-IntuneMobileDevicesWindow {
                 
             } catch {
                 $errorMsg = $_.Exception.Message
-                Write-Log "Export error: $errorMsg"
                 $StatusText.Text = "Export failed"
                 $StatusText.Foreground = "#dc3545"
                 [System.Windows.MessageBox]::Show(
@@ -6792,9 +7759,250 @@ function Show-IntuneMobileDevicesWindow {
         }
         
         # Button event handlers
-        $LoadDevicesButton.Add_Click({ Load-IntuneDevices })
-        $RefreshButton.Add_Click({ Load-IntuneDevices })
-        $ExportButton.Add_Click({ Export-IntuneDevicesToExcel })
+        $LoadDevicesButton.Add_Click({
+            try {
+                # Get fresh references to controls
+                $LoadDevicesButton = $window.FindName("LoadDevicesButton")
+                $RefreshButton = $window.FindName("RefreshButton")
+                $StatusText = $window.FindName("StatusText")
+                $DevicesDataGrid = $window.FindName("DevicesDataGrid")
+                $ExportButton = $window.FindName("ExportButton")
+                $DeviceCountText = $window.FindName("DeviceCountText")
+                $IosCountText = $window.FindName("IosCountText")
+                $AndroidCountText = $window.FindName("AndroidCountText")
+                $WindowsCountText = $window.FindName("WindowsCountText")
+                $MacOSCountText = $window.FindName("MacOSCountText")
+                $CompliantCountText = $window.FindName("CompliantCountText")
+                $NonCompliantCountText = $window.FindName("NonCompliantCountText")
+                $SearchBox = $window.FindName("SearchBox")
+                $FilteriOS = $window.FindName("FilteriOS")
+                $FilterAndroid = $window.FindName("FilterAndroid")
+                $FilterWindows = $window.FindName("FilterWindows")
+                $FilterMacOS = $window.FindName("FilterMacOS")
+                
+                $LoadDevicesButton.IsEnabled = $false
+                $RefreshButton.IsEnabled = $false
+                $StatusText.Text = "Connecting to Microsoft Graph..."
+                $StatusText.Foreground = "#FF9800"
+                
+                # Check if Microsoft.Graph modules are installed
+                $requiredModules = @('Microsoft.Graph.Authentication', 'Microsoft.Graph.DeviceManagement')
+                foreach ($module in $requiredModules) {
+                    if (-not (Get-Module -ListAvailable -Name $module)) {
+                        $StatusText.Text = "Installing $module module..."
+                        Install-Module -Name $module -Scope CurrentUser -Force -AllowClobber
+                    }
+                }
+                
+                # Import modules
+                Import-Module Microsoft.Graph.Authentication -ErrorAction Stop
+                Import-Module Microsoft.Graph.DeviceManagement -ErrorAction Stop
+                
+                # Check if already connected
+                $context = Get-MgContext -ErrorAction SilentlyContinue
+                if ($null -eq $context) {
+                    # Connect to Microsoft Graph
+                    Connect-MgGraph -Scopes "DeviceManagementManagedDevices.Read.All", "User.Read.All" -NoWelcome
+                }
+                
+                $StatusText.Text = "Retrieving devices from Intune..."
+                
+                # Get all managed devices using pagination
+                $uri = "https://graph.microsoft.com/v1.0/deviceManagement/managedDevices"
+                $allDevices = @()
+                
+                do {
+                    $response = Invoke-MgGraphRequest -Uri $uri -Method GET
+                    $allDevices += $response.value
+                    $uri = $response.'@odata.nextLink'
+                    
+                    $StatusText.Text = "Retrieved $($allDevices.Count) devices..."
+                } while ($uri)
+                
+                # Store all devices
+                $script:allDevices = $allDevices
+                
+                $StatusText.Text = "Filtering devices..."
+                
+                # Apply filter based on checkboxes
+                # Build list of selected operating systems
+                $selectedOS = @()
+                if ($FilteriOS.IsChecked) { $selectedOS += @('iOS', 'iPadOS') }
+                if ($FilterAndroid.IsChecked) { $selectedOS += 'Android' }
+                if ($FilterWindows.IsChecked) { $selectedOS += 'Windows' }
+                if ($FilterMacOS.IsChecked) { $selectedOS += 'macOS' }
+                
+                # Filter devices based on selected OS types
+                $filteredDevices = $script:allDevices | Where-Object {
+                    $os = $_.operatingSystem
+                    # Check if Windows checkbox is selected and OS contains Windows
+                    if ($FilterWindows.IsChecked -and $os -like 'Windows*') {
+                        return $true
+                    }
+                    # Check if OS matches any other selected types
+                    return $os -in $selectedOS
+                }
+                
+                # Format device information
+                $script:intuneDevices = @()
+                foreach ($device in $filteredDevices) {
+                    $script:intuneDevices += [PSCustomObject]@{
+                        'Device Name' = $device.deviceName
+                        'User Display Name' = $device.userDisplayName
+                        'User Principal Name' = $device.userPrincipalName
+                        'Operating System' = $device.operatingSystem
+                        'OS Version' = $device.osVersion
+                        'Model' = $device.model
+                        'Manufacturer' = $device.manufacturer
+                        'IMEI' = $device.imei
+                        'Serial Number' = $device.serialNumber
+                        'Phone Number' = $device.phoneNumber
+                        'Enrollment Date' = if ($device.enrolledDateTime) { 
+                            (Get-Date $device.enrolledDateTime).ToString('yyyy-MM-dd HH:mm:ss') 
+                        } else { 'N/A' }
+                        'Last Sync' = if ($device.lastSyncDateTime) { 
+                            (Get-Date $device.lastSyncDateTime).ToString('yyyy-MM-dd HH:mm:ss') 
+                        } else { 'N/A' }
+                        'Compliance State' = $device.complianceState
+                        'Management State' = $device.managementState
+                        'Ownership' = $device.managedDeviceOwnerType
+                        'Supervised' = $device.isSupervised
+                        'Encrypted' = $device.isEncrypted
+                        'Jail Broken' = $device.jailBroken
+                        'Total Storage (GB)' = if ($device.totalStorageSpaceInBytes) { 
+                            [math]::Round($device.totalStorageSpaceInBytes / 1GB, 2) 
+                        } else { 'N/A' }
+                        'Free Storage (GB)' = if ($device.freeStorageSpaceInBytes) { 
+                            [math]::Round($device.freeStorageSpaceInBytes / 1GB, 2) 
+                        } else { 'N/A' }
+                    }
+                }
+                
+                # Update DataGrid
+                $DevicesDataGrid.ItemsSource = $script:intuneDevices
+                
+                # Clear search box
+                $SearchBox.Text = ""
+                
+                # Update statistics
+                $total = $script:intuneDevices.Count
+                $DeviceCountText.Text = $total.ToString()
+                
+                if ($total -gt 0) {
+                    $iosCount = ($script:intuneDevices | Where-Object { $_.'Operating System' -in @('iOS', 'iPadOS') }).Count
+                    $androidCount = ($script:intuneDevices | Where-Object { $_.'Operating System' -eq 'Android' }).Count
+                    $windowsCount = ($script:intuneDevices | Where-Object { $_.'Operating System' -like 'Windows*' }).Count
+                    $macosCount = ($script:intuneDevices | Where-Object { $_.'Operating System' -eq 'macOS' }).Count
+                    $compliantCount = ($script:intuneDevices | Where-Object { $_.'Compliance State' -eq 'compliant' }).Count
+                    $nonCompliantCount = ($script:intuneDevices | Where-Object { $_.'Compliance State' -eq 'noncompliant' }).Count
+                    
+                    $IosCountText.Text = $iosCount.ToString()
+                    $AndroidCountText.Text = $androidCount.ToString()
+                    $WindowsCountText.Text = $windowsCount.ToString()
+                    $MacOSCountText.Text = $macosCount.ToString()
+                    $CompliantCountText.Text = $compliantCount.ToString()
+                    $NonCompliantCountText.Text = $nonCompliantCount.ToString()
+                } else {
+                    $IosCountText.Text = "0"
+                    $AndroidCountText.Text = "0"
+                    $WindowsCountText.Text = "0"
+                    $MacOSCountText.Text = "0"
+                    $CompliantCountText.Text = "0"
+                    $NonCompliantCountText.Text = "0"
+                }
+                
+                $StatusText.Text = "Loaded $($script:intuneDevices.Count) devices"
+                $StatusText.Foreground = "#28a745"
+                
+                $ExportButton.IsEnabled = $true
+                
+            } catch {
+                $errorMsg = $_.Exception.Message
+                $StatusText = $window.FindName("StatusText")
+                if ($StatusText) {
+                    $StatusText.Text = "Error: Click for details"
+                    $StatusText.Foreground = "#dc3545"
+                }
+                [System.Windows.MessageBox]::Show(
+                    "Failed to load Intune devices:`n`n$errorMsg`n`nPlease ensure:`n- Microsoft Graph modules are installed`n- You have proper permissions`n- Network connection is available",
+                    "Error Loading Devices",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Error
+                )
+            } finally {
+                $LoadDevicesButton = $window.FindName("LoadDevicesButton")
+                $RefreshButton = $window.FindName("RefreshButton")
+                if ($LoadDevicesButton) { $LoadDevicesButton.IsEnabled = $true }
+                if ($RefreshButton) { $RefreshButton.IsEnabled = $true }
+            }
+        }.GetNewClosure())
+        
+        $RefreshButton.Add_Click({
+            # Simply trigger the Load Devices button
+            $LoadDevicesButton = $window.FindName("LoadDevicesButton")
+            if ($LoadDevicesButton) {
+                $LoadDevicesButton.RaiseEvent((New-Object System.Windows.RoutedEventArgs([System.Windows.Controls.Button]::ClickEvent)))
+            }
+        }.GetNewClosure())
+        
+        # Search functionality
+        $SearchBox.Add_TextChanged({
+            try {
+                # Get fresh references to controls
+                $SearchBox = $window.FindName("SearchBox")
+                $DevicesDataGrid = $window.FindName("DevicesDataGrid")
+                $DeviceCountText = $window.FindName("DeviceCountText")
+                
+                if (-not $SearchBox -or -not $DevicesDataGrid -or -not $DeviceCountText) {
+                    return
+                }
+                
+                $searchTerm = $SearchBox.Text.Trim()
+                
+                if ([string]::IsNullOrWhiteSpace($searchTerm)) {
+                    # If search is empty, show all devices
+                    if ($script:intuneDevices) {
+                        $DevicesDataGrid.ItemsSource = $script:intuneDevices
+                        $DeviceCountText.Text = $script:intuneDevices.Count.ToString()
+                    }
+                } else {
+                    # Filter devices based on search term
+                    if ($script:intuneDevices -and $script:intuneDevices.Count -gt 0) {
+                        $filtered = $script:intuneDevices | Where-Object {
+                            $_.'Device Name' -like "*$searchTerm*" -or
+                            $_.'User Display Name' -like "*$searchTerm*" -or
+                            $_.'User Principal Name' -like "*$searchTerm*" -or
+                            $_.'Operating System' -like "*$searchTerm*" -or
+                            $_.'Model' -like "*$searchTerm*" -or
+                            $_.'Serial Number' -like "*$searchTerm*" -or
+                            $_.'IMEI' -like "*$searchTerm*"
+                        }
+                        
+                        if ($filtered) {
+                            $DevicesDataGrid.ItemsSource = $filtered
+                            $DeviceCountText.Text = $filtered.Count.ToString()
+                        } else {
+                            $DevicesDataGrid.ItemsSource = @()
+                            $DeviceCountText.Text = "0"
+                        }
+                    }
+                }
+            } catch {
+                # Silently fail - search is not critical
+            }
+        }.GetNewClosure())
+        
+        $ClearSearchButton.Add_Click({
+            $SearchBox = $window.FindName("SearchBox")
+            $DevicesDataGrid = $window.FindName("DevicesDataGrid")
+            $DeviceCountText = $window.FindName("DeviceCountText")
+            
+            $SearchBox.Text = ""
+            $DevicesDataGrid.ItemsSource = $script:intuneDevices
+            $DeviceCountText.Text = $script:intuneDevices.Count.ToString()
+        }.GetNewClosure())
+        
+        $ExportButton.Add_Click({ Export-IntuneDevicesToExcel }.GetNewClosure())
         $CloseButton.Add_Click({ $window.Close() })
         
         # Initial state
@@ -6805,7 +8013,6 @@ function Show-IntuneMobileDevicesWindow {
         
     } catch {
         $errorMsg = $_.Exception.Message
-        Write-Log "Error opening Intune Mobile Devices window: $errorMsg"
         [System.Windows.MessageBox]::Show(
             "Failed to open Intune Mobile Devices window:`n`n$errorMsg",
             "Error",
@@ -6852,6 +8059,338 @@ $syncHash.IntuneComplianceButton.Add_Click({
         [System.Windows.MessageBoxImage]::Information
     )
 })
+
+# Microsoft 365 - Generate Temporary Access Pass
+$syncHash.GenerateTAPButton.Add_Click({
+    Write-Log "Opening Generate Temporary Access Pass window..."
+    Show-GenerateTAPWindow
+})
+
+function Show-GenerateTAPWindow {
+    # Check for Microsoft Graph module
+    if (-not (Get-Module -ListAvailable -Name Microsoft.Graph.Authentication)) {
+        [System.Windows.MessageBox]::Show(
+            "Microsoft Graph Authentication module is not available.`n`nPlease install the Microsoft Graph PowerShell SDK.",
+            "Module Required",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+        return
+    }
+    
+    try {
+        Import-Module Microsoft.Graph.Authentication -ErrorAction Stop
+    } catch {
+        [System.Windows.MessageBox]::Show(
+            "Failed to load Microsoft Graph Authentication module.`n`n$($_.Exception.Message)",
+            "Module Error",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+        return
+    }
+    
+    try {
+        # Check if Microsoft Graph is connected
+        $graphContext = Get-MgContext -ErrorAction SilentlyContinue
+        if ($null -eq $graphContext) {
+            $result = [System.Windows.MessageBox]::Show(
+                "You are not connected to Microsoft Graph.`n`nWould you like to connect now?`n`nRequired permissions: UserAuthenticationMethod.ReadWrite.All",
+                "Connection Required",
+                [System.Windows.MessageBoxButton]::YesNo,
+                [System.Windows.MessageBoxImage]::Question
+            )
+            
+            if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
+                try {
+                    Connect-MgGraph -Scopes "UserAuthenticationMethod.ReadWrite.All" -NoWelcome
+                    $graphContext = Get-MgContext -ErrorAction SilentlyContinue
+                    
+                    if ($null -eq $graphContext) {
+                        [System.Windows.MessageBox]::Show(
+                            "Failed to connect to Microsoft Graph. Please try again.",
+                            "Connection Failed",
+                            [System.Windows.MessageBoxButton]::OK,
+                            [System.Windows.MessageBoxImage]::Error
+                        )
+                        return
+                    }
+                } catch {
+                    $errorMsg = $_.Exception.Message
+                    [System.Windows.MessageBox]::Show(
+                        "Failed to connect to Microsoft Graph:`n`n$errorMsg",
+                        "Connection Error",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Error
+                    )
+                    return
+                }
+            } else {
+                return
+            }
+        }
+
+        [xml]$TAPWindowXAML = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Generate Temporary Access Pass" 
+        Height="550" 
+        Width="650" 
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Instructions -->
+        <Border Grid.Row="0" Background="#e3f2fd" BorderBrush="#2196f3" BorderThickness="1" Padding="10" Margin="0,0,0,15" CornerRadius="3">
+            <StackPanel>
+                <TextBlock Text="Temporary Access Pass (TAP) Generator" FontWeight="Bold" FontSize="14" Foreground="#1976d2" Margin="0,0,0,5"/>
+                <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="#555">
+                    A Temporary Access Pass is a time-limited passcode that can be used as a strong credential to onboard passwordless methods like Windows Hello for Business, Microsoft Authenticator, or FIDO2 security keys.
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- User Input -->
+        <GroupBox Grid.Row="1" Header="User Account" Padding="10" Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="Enter the User Principal Name (UPN) or Username:" Margin="0,0,0,5"/>
+                <TextBox x:Name="UsernameTextBox" 
+                         Height="30" 
+                         Padding="5"
+                         ToolTip="Example: john.doe@company.com or john.doe"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- TAP Settings -->
+        <GroupBox Grid.Row="2" Header="TAP Settings" Padding="10" Margin="0,0,0,15">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="Lifetime (minutes):" Width="150" VerticalAlignment="Center"/>
+                    <TextBox x:Name="LifetimeTextBox" 
+                             Width="100" 
+                             Height="30" 
+                             Padding="5"
+                             Text="60"
+                             ToolTip="TAP validity period in minutes (10-43200)"/>
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="One-time use:" Width="150" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="OneTimeUseCheckBox" 
+                              IsChecked="True" 
+                              VerticalAlignment="Center"
+                              ToolTip="If checked, TAP can only be used once"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Result Display -->
+        <GroupBox Grid.Row="4" Header="Generated Temporary Access Pass" Padding="10" x:Name="ResultGroupBox" Visibility="Collapsed">
+            <StackPanel>
+                <Border Background="#fff3cd" BorderBrush="#ffc107" BorderThickness="1" Padding="10" Margin="0,0,0,10" CornerRadius="3">
+                    <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="#856404">
+                        IMPORTANT: This TAP will only be displayed once. Copy it now and provide it to the user. It cannot be retrieved again.
+                    </TextBlock>
+                </Border>
+                
+                <TextBlock Text="Temporary Access Pass:" FontWeight="Bold" Margin="0,0,0,5"/>
+                <Border Background="White" BorderBrush="#dee2e6" BorderThickness="1" Padding="10" CornerRadius="3">
+                    <TextBox x:Name="TAPResultTextBox" 
+                             IsReadOnly="True" 
+                             FontFamily="Consolas"
+                             FontSize="18"
+                             FontWeight="Bold"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Foreground="#28a745"
+                             TextAlignment="Center"
+                             HorizontalAlignment="Stretch"/>
+                </Border>
+                
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button x:Name="CopyTAPButton" 
+                            Content="Copy to Clipboard" 
+                            Width="150" 
+                            Height="35" 
+                            Margin="0,0,10,0"
+                            Background="#007bff"
+                            Foreground="White"
+                            FontWeight="Bold"
+                            Cursor="Hand"/>
+                    <StackPanel x:Name="TAPDetailsPanel" VerticalAlignment="Center">
+                        <TextBlock x:Name="TAPDetailsText" 
+                                   FontSize="10" 
+                                   Foreground="#666"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button x:Name="GenerateButton" 
+                    Content="Generate TAP" 
+                    Width="120" 
+                    Height="35" 
+                    Margin="0,0,10,0"
+                    Background="#28a745"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Cursor="Hand"/>
+            <Button x:Name="CloseButton" 
+                    Content="Close" 
+                    Width="100" 
+                    Height="35"
+                    Background="#6c757d"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Cursor="Hand"/>
+        </StackPanel>
+    </Grid>
+</Window>
+"@
+
+        $tapReader = New-Object System.Xml.XmlNodeReader $TAPWindowXAML
+        $TAPWindow = [Windows.Markup.XamlReader]::Load($tapReader)
+
+        # Get controls
+        $UsernameTextBox = $TAPWindow.FindName("UsernameTextBox")
+        $LifetimeTextBox = $TAPWindow.FindName("LifetimeTextBox")
+        $OneTimeUseCheckBox = $TAPWindow.FindName("OneTimeUseCheckBox")
+        $GenerateButton = $TAPWindow.FindName("GenerateButton")
+        $CloseButton = $TAPWindow.FindName("CloseButton")
+        $ResultGroupBox = $TAPWindow.FindName("ResultGroupBox")
+        $TAPResultTextBox = $TAPWindow.FindName("TAPResultTextBox")
+        $CopyTAPButton = $TAPWindow.FindName("CopyTAPButton")
+        $TAPDetailsText = $TAPWindow.FindName("TAPDetailsText")
+
+        # Generate Button Click
+        $GenerateButton.Add_Click({
+            try {
+                $username = $UsernameTextBox.Text.Trim()
+                if ([string]::IsNullOrWhiteSpace($username)) {
+                    [System.Windows.MessageBox]::Show(
+                        "Please enter a username or UPN.",
+                        "Input Required",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Warning
+                    )
+                    return
+                }
+
+                # Validate lifetime
+                $lifetime = 60
+                if (-not [int]::TryParse($LifetimeTextBox.Text, [ref]$lifetime) -or $lifetime -lt 10 -or $lifetime -gt 43200) {
+                    [System.Windows.MessageBox]::Show(
+                        "Lifetime must be a number between 10 and 43200 minutes.",
+                        "Invalid Lifetime",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Warning
+                    )
+                    return
+                }
+
+                $GenerateButton.IsEnabled = $false
+                $GenerateButton.Content = "Generating..."
+
+                # Get user ID
+                $user = Get-MgUser -Filter "userPrincipalName eq '$username' or mailNickname eq '$username'" -ErrorAction Stop
+                if ($null -eq $user) {
+                    throw "User not found: $username"
+                }
+
+                # Create TAP parameters
+                $tapParams = @{
+                    LifetimeInMinutes = $lifetime
+                    IsUsableOnce = $OneTimeUseCheckBox.IsChecked
+                }
+
+                # Generate TAP
+                $tap = New-MgUserAuthenticationTemporaryAccessPassMethod -UserId $user.Id -BodyParameter $tapParams -ErrorAction Stop
+
+                # Display result
+                $TAPResultTextBox.Text = $tap.TemporaryAccessPass
+                $ResultGroupBox.Visibility = [System.Windows.Visibility]::Visible
+                
+                $expiryTime = (Get-Date).AddMinutes($lifetime).ToString("MM/dd/yyyy hh:mm tt")
+                $usageType = if ($OneTimeUseCheckBox.IsChecked) { "One-time use" } else { "Multi-use" }
+                $TAPDetailsText.Text = "User: $($user.DisplayName)`nExpires: $expiryTime`nType: $usageType"
+                
+                $GenerateButton.Content = "Generate Another"
+                $GenerateButton.IsEnabled = $true
+
+                # Focus username field for next generation
+                $UsernameTextBox.Focus()
+
+            } catch {
+                $errorMsg = $_.Exception.Message
+                [System.Windows.MessageBox]::Show(
+                    "Failed to generate Temporary Access Pass:`n`n$errorMsg",
+                    "Error",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Error
+                )
+                $GenerateButton.Content = "Generate TAP"
+                $GenerateButton.IsEnabled = $true
+            }
+        })
+
+        # Copy Button Click
+        $CopyTAPButton.Add_Click({
+            try {
+                $tap = $TAPResultTextBox.Text
+                if (-not [string]::IsNullOrWhiteSpace($tap)) {
+                    [System.Windows.Clipboard]::SetText($tap)
+                    $CopyTAPButton.Content = "Copied!"
+                    
+                    # Reset button text after 2 seconds
+                    $timer = New-Object System.Windows.Threading.DispatcherTimer
+                    $timer.Interval = [TimeSpan]::FromSeconds(2)
+                    $timer.Add_Tick({
+                        $CopyTAPButton.Content = "Copy to Clipboard"
+                        $timer.Stop()
+                    })
+                    $timer.Start()
+                }
+            } catch {
+                # Silently handle clipboard errors
+            }
+        })
+
+        # Close Button Click
+        $CloseButton.Add_Click({
+            $TAPWindow.Close()
+        })
+
+        # Enter key support for username field
+        $UsernameTextBox.Add_KeyDown({
+            param($sender, $e)
+            if ($e.Key -eq [System.Windows.Input.Key]::Enter) {
+                $GenerateButton.RaiseEvent([System.Windows.RoutedEventArgs]::new([System.Windows.Controls.Button]::ClickEvent))
+            }
+        })
+
+        $TAPWindow.ShowDialog() | Out-Null
+
+    } catch {
+        $errorMsg = $_.Exception.Message
+        [System.Windows.MessageBox]::Show(
+            "Failed to open Generate TAP window:`n`n$errorMsg",
+            "Error",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
 
 Write-Log "IT Operations Center initialized"
 Write-Log "Ready for IT operations management"
